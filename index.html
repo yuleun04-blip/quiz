@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>원소 퀴즈 — 과학 시험 대비 원소기호 게임</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f4;--card:#fff;--ink:#14212b;--mute:#5a6872;--line:#d3dbd9;--pri:#5b3cc4;--ok:#1b8a5a;--mid:#b7791f;--bad:#c0392b;--on:#fff;--tile:#e6ebe9;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1517;--card:#162024;--ink:#e7eeee;--mute:#93a3a8;--line:#27363b;--pri:#a592ff;--ok:#4cc38a;--mid:#e0a94a;--bad:#f0877b;--on:#0e1517;--tile:#202d32}}
+:root[data-theme="dark"]{--bg:#0e1517;--card:#162024;--ink:#e7eeee;--mute:#93a3a8;--line:#27363b;--pri:#a592ff;--ok:#4cc38a;--mid:#e0a94a;--bad:#f0877b;--on:#0e1517;--tile:#202d32}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.7 "Noto Sans KR",system-ui,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1,h2{font-family:"Noto Serif KR",Georgia,serif;margin:0;line-height:1.3}
+h1{font-size:30px;font-weight:900}
+h2{font-size:19px;font-weight:700;margin:26px 0 10px}
+.sub{color:var(--mute);margin:4px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:14px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opts button,.btn{padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:500 15px "Noto Sans KR",sans-serif;cursor:pointer}
+.opts button[aria-pressed="true"]{border-color:var(--pri);background:var(--pri);color:var(--on);font-weight:700}
+.btn.go{background:var(--pri);border-color:var(--pri);color:var(--on);font-weight:700;font-size:17px;padding:13px 26px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--mid);outline-offset:2px}
+label.t{display:flex;gap:8px;align-items:center;font-size:15px;cursor:pointer}
+.pt{overflow-x:auto;padding-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(18,34px);grid-auto-rows:34px;gap:3px;min-width:640px}
+.tile{display:grid;place-items:center;background:var(--tile);border-radius:6px;font:700 13px "Noto Serif KR",serif;color:var(--mute)}
+.tile.g{background:var(--ok);color:var(--on)}.tile.m{background:var(--mid);color:var(--on)}.tile.b{background:var(--bad);color:var(--on)}
+.ex{display:flex;gap:3px;margin-top:3px}.ex .tile{width:34px;height:34px}
+.leg{font-size:13px;color:var(--mute);margin-top:8px}
+.top{display:flex;justify-content:space-between;font-size:14px;color:var(--mute);gap:8px;flex-wrap:wrap}
+.bar{height:6px;background:var(--tile);border-radius:9px;overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;background:var(--pri);width:0}
+.bar.tm i{background:var(--mid)}
+.cell{width:150px;height:150px;margin:18px auto 6px;border:3px solid var(--ink);border-radius:12px;display:grid;place-items:center;position:relative;background:var(--card);text-align:center}
+.cell .z{position:absolute;top:6px;left:10px;font-size:14px;color:var(--mute)}
+.cell .big{font:900 64px/1 "Noto Serif KR",serif}
+.cell .nm{font:700 30px/1.2 "Noto Sans KR",sans-serif;padding:0 8px}
+.q{text-align:center;color:var(--mute);margin:0}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+@media(max-width:480px){.choices{grid-template-columns:1fr}}
+.choices button{padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:700 20px "Noto Serif KR","Noto Sans KR",serif;cursor:pointer}
+.choices button.ok,.fb.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent)}
+.choices button.no,.fb.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.choices small{display:block;font:400 12px "Noto Sans KR",sans-serif;color:var(--mute)}
+.type{display:flex;gap:8px;margin-top:14px}
+.type input{flex:1;padding:12px;font:700 22px "Noto Serif KR",serif;text-align:center;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.fb{margin-top:14px;padding:12px 14px;border:1.5px solid;border-radius:12px}
+.big2{font:900 54px/1 "Noto Serif KR",serif;color:var(--pri)}
+.rs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+.rs div{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)}
+.rs b{display:block;font:800 22px "Noto Serif KR",serif}.rs span{font-size:13px;color:var(--mute)}
+.wl{margin:8px 0 0;padding:0;list-style:none}.wl li{padding:7px 0;border-bottom:1px solid var(--line);font-size:15px}
+.wl b{font-family:"Noto Serif KR",serif;font-size:18px;margin-right:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const D="1 H 수소|2 He 헬륨|3 Li 리튬|4 Be 베릴륨|5 B 붕소|6 C 탄소|7 N 질소|8 O 산소|9 F 플루오린|10 Ne 네온|11 Na 나트륨|12 Mg 마그네슘|13 Al 알루미늄|14 Si 규소|15 P 인|16 S 황|17 Cl 염소|18 Ar 아르곤|19 K 칼륨|20 Ca 칼슘|21 Sc 스칸듐|22 Ti 타이타늄|23 V 바나듐|24 Cr 크로뮴|25 Mn 망가니즈|26 Fe 철|27 Co 코발트|28 Ni 니켈|29 Cu 구리|30 Zn 아연|31 Ga 갈륨|32 Ge 저마늄|33 As 비소|34 Se 셀레늄|35 Br 브로민|36 Kr 크립톤|47 Ag 은|50 Sn 주석|53 I 아이오딘|56 Ba 바륨|79 Au 금|80 Hg 수은|82 Pb 납|92 U 우라늄".split("|").map(s=>{const[a,b,c]=s.split(" ");return{z:+a,s:b,k:c}});
+const NOTE={Na:"natrium",K:"kalium",Fe:"ferrum",Cu:"cuprum",Ag:"argentum",Sn:"stannum",Au:"aurum",Hg:"hydrargyrum",Pb:"plumbum"};
+const RANGES={"10":["1~10번",d=>d.z<=10],"20":["1~20번",d=>d.z<=20],"36":["1~36번",d=>d.z<=36],"all":["주요 원소 전체 (44개)",d=>true]};
+const MODES={sn:["기호 → 이름","원소 기호를 보고 이름 고르기"],ns:["이름 → 기호","이름을 보고 기호 고르기"],ty:["직접 쓰기","이름을 보고 기호를 직접 입력 (대소문자 구분)"]};
+const $=s=>document.querySelector(s),app=$("#app");
+let SV={stats:{},best:{}};try{SV=JSON.parse(localStorage.getItem("elq")||"")||SV}catch(e){}
+const save=()=>{try{localStorage.setItem("elq",JSON.stringify(SV))}catch(e){}};
+let cfg={mode:"sn",range:"20",timer:false},G=null,tm=null;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function pos(z){if(z==1)return[1,1];if(z==2)return[1,18];if(z<=10){const i=z-3;return[2,i<2?i+1:i+11]}if(z<=18){const i=z-11;return[3,i<2?i+1:i+11]}return[4,z-18]}
+function cls(sym){const s=SV.stats[sym];if(!s||s.r+s.w==0)return"";const a=s.r/(s.r+s.w);return a>=.8?"g":a>=.5?"m":"b"}
+function home(){clearInterval(tm);
+ const tiles=D.filter(d=>d.z<=36).map(d=>{const[r,c]=pos(d.z);return`<div class="tile ${cls(d.s)}" style="grid-row:${r};grid-column:${c}" title="${d.z} ${d.s} ${d.k}">${d.s}</div>`}).join("");
+ const ex=D.filter(d=>d.z>36).map(d=>`<div class="tile ${cls(d.s)}" title="${d.z} ${d.s} ${d.k}">${d.s}</div>`).join("");
+ const btn=(grp,obj,key)=>Object.entries(obj).map(([k,v])=>`<button data-${grp}="${k}" aria-pressed="${cfg[key]===k}">${v[0]}</button>`).join("");
+ const best=SV.best[cfg.mode+cfg.range+(cfg.timer?"t":"")];
+ app.innerHTML=`<h1>원소 퀴즈</h1><p class="sub">원소기호를 게임처럼 외워서 과학 시험을 준비해요. 10문제를 풀고 점수를 올려 보세요.</p>
+ <div class="card"><h2 style="margin-top:0">게임 설정</h2>
+ <p style="margin:0 0 6px"><b>방식</b></p><div class="opts">${Object.entries(MODES).map(([k,v])=>`<button data-m="${k}" aria-pressed="${cfg.mode===k}">${v[0]}</button>`).join("")}</div>
+ <p class="sub" style="font-size:14px">${MODES[cfg.mode][1]}</p>
+ <p style="margin:12px 0 6px"><b>범위</b></p><div class="opts">${Object.entries(RANGES).map(([k,v])=>`<button data-r="${k}" aria-pressed="${cfg.range===k}">${v[0]}</button>`).join("")}</div>
+ <p style="margin:12px 0 0"><label class="t"><input type="checkbox" id="tmr" ${cfg.timer?"checked":""}> 문제당 10초 제한 (빠를수록 보너스)</label></p>
+ <div class="row" style="align-items:center"><button class="btn go" id="go">시작하기</button><span class="sub">${best?"이 설정 최고점 "+best+"점":"아직 기록이 없어요"}</span></div></div>
+ <h2>내 원소 지도</h2><div class="card" style="margin-top:0"><div class="pt"><div class="grid">${tiles}</div><div class="ex">${ex}</div></div>
+ <p class="leg">초록 정답률 80% 이상 · 노랑 50~79% · 빨강 50% 미만 · 회색 아직 안 풀었어요. 빨간 칸부터 다시 풀어 보세요.</p></div>`;
+ app.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;home()});
+ app.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{cfg.range=b.dataset.r;home()});
+ $("#tmr").onchange=e=>{cfg.timer=e.target.checked;home()};
+ $("#go").onclick=()=>start()}
+function sim(a,b){return(a.s[0]==b.s[0]?2:0)+(a.s.length==b.s.length?1:0)+Math.random()}
+function start(list){const pool=D.filter(RANGES[cfg.range][1]);
+ const qs=(list||shuffle(pool).slice(0,10));
+ G={qs,i:0,score:0,combo:0,maxc:0,ok:0,wrong:[],pool,done:false};ask()}
+function ask(){clearInterval(tm);const q=G.qs[G.i];G.done=false;G.left=10;
+ const m=cfg.mode;let body="";
+ if(m=="sn")body=`<div class="cell"><span class="z">${q.z}</span><span class="big">${q.s}</span></div><p class="q">이 원소기호의 이름은?</p>`;
+ else body=`<div class="cell"><span class="nm">${q.k}</span></div><p class="q">이 원소의 기호는?</p>`;
+ let inp="";
+ if(m=="ty")inp=`<div class="type"><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="3" aria-label="원소 기호 입력"><button class="btn go" id="sub" style="padding:10px 20px">확인</button></div>`;
+ else{const others=G.pool.filter(d=>d.z!=q.z);const ds=(m=="ns"?others.sort((a,b)=>sim(q,b)-sim(q,a)):shuffle(others)).slice(0,3);
+  inp=`<div class="choices">${shuffle([q,...ds]).map((d,n)=>`<button data-z="${d.z}">${m=="sn"?d.k:d.s}</button>`).join("")}</div>`}
+ app.innerHTML=`<div class="top"><span>${G.i+1} / ${G.qs.length}</span><span>점수 ${G.score}</span><span>콤보 ${G.combo}</span></div>
+ <div class="bar"><i style="width:${G.i/G.qs.length*100}%"></i></div>${cfg.timer?'<div class="bar tm"><i id="tb" style="width:100%"></i></div>':""}
+ <div class="card">${body}${inp}<div id="fb"></div></div>`;
+ if(m=="ty"){const a=$("#ans");a.focus();a.onkeydown=e=>{if(e.key=="Enter")submit(a.value.trim())};$("#sub").onclick=()=>submit(a.value.trim())}
+ else app.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>submit(+b.dataset.z,b));
+ if(cfg.timer){const t0=Date.now();tm=setInterval(()=>{G.left=Math.max(0,10-(Date.now()-t0)/1000);const tb=$("#tb");if(tb)tb.style.width=G.left*10+"%";if(G.left<=0){clearInterval(tm);submit(null)}},100)}}
+function submit(v,btn){if(G.done)return;G.done=true;clearInterval(tm);
+ const q=G.qs[G.i],m=cfg.mode;let ok,msg="";
+ if(m=="ty"){ok=v===q.s;if(!ok&&v&&v.toLowerCase()===q.s.toLowerCase())msg="대소문자를 확인해요. 첫 글자는 대문자, 둘째 글자는 소문자예요. "}
+ else ok=v===q.z;
+ if(v===null)msg="시간이 지났어요. ";
+ const st=SV.stats[q.s]||(SV.stats[q.s]={r:0,w:0});
+ let gain=0;
+ if(ok){st.r++;G.ok++;G.combo++;G.maxc=Math.max(G.maxc,G.combo);gain=100+Math.min(G.combo-1,4)*10+(cfg.timer?Math.round(G.left)*5:0);G.score+=gain}
+ else{st.w++;G.combo=0;G.wrong.push(q)}
+ save();
+ app.querySelectorAll("[data-z]").forEach(b=>{b.disabled=true;if(+b.dataset.z===q.z)b.classList.add("ok");else if(b===btn)b.classList.add("no")});
+ const n=NOTE[q.s]?`<br><small>기호 ${q.s}는 라틴어 ${NOTE[q.s]}에서 왔어요. 영어 이름과 달라서 시험에 자주 나와요.</small>`:"";
+ const last=G.i+1>=G.qs.length;
+ $("#fb").innerHTML=`<div class="fb ${ok?"ok":"no"}"><b>${ok?"정답! +"+gain+"점":"아쉬워요"}</b> ${ok?"":msg}<br>${q.z}번 <b>${q.s}</b> = ${q.k}${n}</div><div class="row"><button class="btn go" id="nx">${last?"결과 보기":"다음 문제"}</button></div>`;
+ const nx=$("#nx");nx.focus();nx.onclick=()=>{G.i++;last?result():ask()}}
+function result(){const n=G.qs.length,acc=Math.round(G.ok/n*100),key=cfg.mode+cfg.range+(cfg.timer?"t":"");
+ const prev=SV.best[key]||0,isBest=G.score>prev&&!G.retry;if(isBest&&!G.retry){SV.best[key]=G.score}save();
+ const msg=acc==100?"만점이에요! 시험장에서도 똑같이 해요.":acc>=80?"거의 다 외웠어요.":acc>=50?"절반은 넘었어요. 틀린 것만 다시 풀어 봐요.":"괜찮아요. 틀린 것부터 천천히 외워 봐요.";
+ app.innerHTML=`<h1>결과</h1><p class="sub">${msg}</p><div class="card"><div class="big2">${G.score}점</div>${isBest?'<p style="color:var(--ok);font-weight:700;margin:4px 0 0">이 설정의 최고 기록이에요!</p>':""}
+ <div class="rs"><div><b>${G.ok} / ${n}</b><span>맞힌 문제</span></div><div><b>${acc}%</b><span>정답률</span></div><div><b>${G.maxc}</b><span>최고 콤보</span></div></div>
+ ${G.wrong.length?`<h2>틀린 원소</h2><ul class="wl">${G.wrong.map(d=>`<li><b>${d.s}</b>${d.z}번 ${d.k}${NOTE[d.s]?" · 라틴어 "+NOTE[d.s]:""}</li>`).join("")}</ul>`:""}
+ <div class="row">${G.wrong.length?'<button class="btn go" id="rt">틀린 것만 다시</button>':""}<button class="btn ${G.wrong.length?"":"go"}" id="ag">새 게임</button><button class="btn" id="hm">설정으로</button></div></div>`;
+ const w=G.wrong.slice();
+ if($("#rt"))$("#rt").onclick=()=>{start(shuffle(w));G.retry=true};
+ $("#ag").onclick=()=>start();$("#hm").onclick=home}
+home();
+</script>
+</body>
+</html>
